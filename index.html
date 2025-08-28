@@ -3,12 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Emergency Service Directory</title>
-  <!-- fortawesome -->
+  <title>Emergency Hotline</title>
+  <!-- Font-awesome-->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha512-DxV+EoADOkOygM4IR9yXP8Sb2qwgidEmeqAEmDKIOfPRQZOWbXCzLC6vjbZyy0vPisbH2SyW27+ddLVCN+OMzQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-  <!-- DaisyUI + Tailwind CSS -->
+  <!-- DaisyUI  -->
   <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" />
+
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
@@ -17,10 +19,9 @@
       border-radius: 1rem;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
-    .glass { backdrop-filter: blur(6px); }
   </style>
 </head>
-<!-- ✅ NAVBAR -->
+<!-- Navbar -->
 <nav class="navbar bg-white bg-opacity-70 shadow sticky top-0 z-50">
   <div class="container mx-auto px-4 flex flex-col sm:flex-row items-center justify-between py-2 gap-3 sm:gap-0">
     <div class="flex items-center gap-3">
@@ -48,7 +49,7 @@
   </div>
 </nav>
 
-<!-- ✅ HERO SECTION -->
+<!-- Banner Section -->
 <header class="w-full">
   <div class="hero min-h-[220px] bg-gradient-to-br from-green-900 via-green-900 to-emerald-900 text-white">
     <div class="hero-content text-center w-full">
@@ -67,7 +68,7 @@
   </div>
 </header>
 
-<!-- ✅ MAIN SECTION -->
+<!-- Main Section -->
 <section class="bg-white bg-opacity-70 pt-0">
   <main class="container mx-auto px-3 md:px-4 lg:px-6">
     <div class="grid grid-cols-12 gap-4 md:gap-6">
@@ -95,7 +96,7 @@
   </main>
 </section>
 
-<!-- template section -->
+<!-- card section -->
 <template id="cardTemplate">
   <div class="soft-card bg-base-100 rounded-2xl p-5 flex flex-col gap-4 relative">
     
@@ -137,13 +138,7 @@
   </div>
 </template>
 
-
-
-
-
-
-
-<!-- ✅ SCRIPT -->
+<!--  java script -->
 <script>
 (function () {
   function init() {
@@ -159,7 +154,6 @@
       heartCount: document.getElementById('heartCount'),
       coinCount: document.getElementById('coinCount'),
       copyCount: document.getElementById('copyCount'),
-      copyPill: document.getElementById('copyPill'),
       cardGrid: document.getElementById('cardGrid'),
       historyList: document.getElementById('historyList'),
       clearHistory: document.getElementById('clearHistory'),
@@ -186,15 +180,12 @@
         });
 
         card.querySelector('[data-role="copyBtn"]').addEventListener('click', () => {
-          copyToClipboard(svc.number, function (ok) {
-            if (ok) {
+          navigator.clipboard.writeText(svc.number)
+            .then(() => {
               state.copies += 1;
               updateCounters();
-              alert('Copied: ' + svc.title + ' — ' + svc.number);
-            } else {
-              alert('Copy failed. Please copy manually: ' + svc.number);
-            }
-          });
+            })
+            .catch(() => alert('Copy failed. Please copy manually: ' + svc.number));
         });
 
         card.querySelector('[data-role="callBtn"]').addEventListener('click', () => {
@@ -218,13 +209,13 @@
       el.historyList.innerHTML = '';
       state.history.forEach(h => {
         const li = document.createElement('li');
-        li.className = 'flex items-center justify-between gap-3 bg-white-100 rounded-xl border p-3';
+        li.className = 'flex items-center justify-between gap-3 bg-white rounded-xl border p-3';
         li.innerHTML = `
           <div>
-            <div class="font-semibold text-lg text-black leading-tight">${escapeHTML(h.title)}</div>
-            <div class="text-sm text-base-content text-black">${escapeHTML(h.number)}</div>
+            <div class="font-semibold text-lg text-black leading-tight">${h.title}</div>
+            <div class="text-sm text-black">${h.number}</div>
           </div>
-          <div class="text-sm text-black">${escapeHTML(h.time)}</div>
+          <div class="text-sm text-black">${h.time}</div>
         `;
         el.historyList.appendChild(li);
       });
@@ -235,10 +226,6 @@
         state.history = [];
         renderHistory();
       });
-
-      el.copyPill.addEventListener('click', () => {
-        alert('Total copied so far: ' + state.copies);
-      });
     }
 
     function updateCounters() {
@@ -247,55 +234,14 @@
       el.copyCount.textContent = state.copies;
     }
 
-    function copyToClipboard(text, cb) {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(() => cb(true)).catch(() => fallbackCopy(text, cb));
-      } else {
-        fallbackCopy(text, cb);
-      }
-    }
-
-    function fallbackCopy(text, cb) {
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      ta.setAttribute('readonly', '');
-      ta.style.position = 'absolute';
-      ta.style.left = '-9999px';
-      document.body.appendChild(ta);
-      ta.select();
-      try {
-        const ok = document.execCommand('copy');
-        document.body.removeChild(ta);
-        cb(ok);
-      } catch {
-        document.body.removeChild(ta);
-        cb(false);
-      }
-    }
-
-    function escapeHTML(str) {
-      return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-    }
-
     function getServices() {
       return [
         { title: 'National Emergency Number', subtitle: 'National Emergency', number: '999', category: 'All', icon: './assets/emergency.png' },
-
         { title: 'Police Helpline Number', subtitle: 'Police', number: '999', category: 'Police', icon: './assets/police.png' },
-
         { title: 'Fire Service Number', subtitle: 'Fire Service', number: '999', category: 'Fire', icon: './assets/fire-service.png' },
-
         { title: 'Ambulance Service', subtitle: 'Ambulance', number: '1994-999999', category: 'Health', icon: './assets/ambulance.png' },
-
         { title: 'Women & Child Helpline', subtitle: 'Women & Child Helpline', number: '109', category: 'Help', icon: './assets/emergency.png' },
-
         { title: 'Anti-Corruption Helpline', subtitle: 'Anti-Corruption', number: '106', category: 'Govt.', icon: './assets/emergency.png' },
-
-        { title: 'Electricity Helpline', subtitle: 'Electricity Outage', number: '16216', category: 'Electricity', icon: './assets/emergency.png' },
-
-        { title: 'Brac Helpline', subtitle: 'Brac', number: '16445', category: 'NGO', icon: './assets/brac.png' },
-
-        { title: 'Bangladesh Railway Helpline', subtitle: 'Bangladesh Railway', number: '163', category: 'Travel', icon: './assets/Bangladesh-Railway.png' },
       ];
     }
   }
@@ -303,6 +249,7 @@
   document.addEventListener('DOMContentLoaded', init);
 })();
 </script>
+
 </body>
 </html>
 
