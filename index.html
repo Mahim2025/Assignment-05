@@ -95,3 +95,173 @@
   </main>
 </section>
 
+
+
+
+
+
+
+<!-- ✅ SCRIPT -->
+<script>
+(function () {
+  function init() {
+    const state = {
+      coins: 100,
+      hearts: 0,
+      copies: 0,
+      services: getServices(),
+      history: []
+    };
+
+    const el = {
+      heartCount: document.getElementById('heartCount'),
+      coinCount: document.getElementById('coinCount'),
+      copyCount: document.getElementById('copyCount'),
+      copyPill: document.getElementById('copyPill'),
+      cardGrid: document.getElementById('cardGrid'),
+      historyList: document.getElementById('historyList'),
+      clearHistory: document.getElementById('clearHistory'),
+      cardTemplate: document.getElementById('cardTemplate')
+    };
+
+    renderCards();
+    bindGlobalUI();
+    updateCounters();
+
+    function renderCards() {
+      el.cardGrid.innerHTML = '';
+      state.services.forEach(function (svc) {
+        const card = el.cardTemplate.content.cloneNode(true);
+        card.querySelector('[data-role="icon"]').src = svc.icon;
+        card.querySelector('[data-role="title"]').textContent = svc.title;
+        card.querySelector('[data-role="subtitle"]').textContent = svc.subtitle;
+        card.querySelector('[data-role="number"]').textContent = svc.number;
+        card.querySelector('[data-role="badge"]').textContent = svc.category;
+
+        card.querySelector('[data-role="heartBtn"]').addEventListener('click', () => {
+          state.hearts += 1;
+          updateCounters();
+        });
+
+        card.querySelector('[data-role="copyBtn"]').addEventListener('click', () => {
+          copyToClipboard(svc.number, function (ok) {
+            if (ok) {
+              state.copies += 1;
+              updateCounters();
+              alert('Copied: ' + svc.title + ' — ' + svc.number);
+            } else {
+              alert('Copy failed. Please copy manually: ' + svc.number);
+            }
+          });
+        });
+
+        card.querySelector('[data-role="callBtn"]').addEventListener('click', () => {
+          if (state.coins < 20) {
+            alert('Not enough coins. Need at least 20.');
+            return;
+          }
+          state.coins -= 20;
+          updateCounters();
+          alert('Calling ' + svc.title + ' at ' + svc.number + '...');
+          const when = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+          state.history.unshift({ title: svc.title, number: svc.number, time: when });
+          renderHistory();
+        });
+
+        el.cardGrid.appendChild(card);
+      });
+    }
+
+    function renderHistory() {
+      el.historyList.innerHTML = '';
+      state.history.forEach(h => {
+        const li = document.createElement('li');
+        li.className = 'flex items-center justify-between gap-3 bg-white-100 rounded-xl border p-3';
+        li.innerHTML = `
+          <div>
+            <div class="font-semibold text-lg text-black leading-tight">${escapeHTML(h.title)}</div>
+            <div class="text-sm text-base-content text-black">${escapeHTML(h.number)}</div>
+          </div>
+          <div class="text-sm text-black">${escapeHTML(h.time)}</div>
+        `;
+        el.historyList.appendChild(li);
+      });
+    }
+
+    function bindGlobalUI() {
+      el.clearHistory.addEventListener('click', () => {
+        state.history = [];
+        renderHistory();
+      });
+
+      el.copyPill.addEventListener('click', () => {
+        alert('Total copied so far: ' + state.copies);
+      });
+    }
+
+    function updateCounters() {
+      el.heartCount.textContent = state.hearts;
+      el.coinCount.textContent = state.coins;
+      el.copyCount.textContent = state.copies;
+    }
+
+    function copyToClipboard(text, cb) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => cb(true)).catch(() => fallbackCopy(text, cb));
+      } else {
+        fallbackCopy(text, cb);
+      }
+    }
+
+    function fallbackCopy(text, cb) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'absolute';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        const ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        cb(ok);
+      } catch {
+        document.body.removeChild(ta);
+        cb(false);
+      }
+    }
+
+    function escapeHTML(str) {
+      return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    }
+
+    function getServices() {
+      return [
+        { title: 'National Emergency Number', subtitle: 'National Emergency', number: '999', category: 'All', icon: './assets/emergency.png' },
+
+        { title: 'Police Helpline Number', subtitle: 'Police', number: '999', category: 'Police', icon: './assets/police.png' },
+
+        { title: 'Fire Service Number', subtitle: 'Fire Service', number: '999', category: 'Fire', icon: './assets/fire-service.png' },
+
+        { title: 'Ambulance Service', subtitle: 'Ambulance', number: '1994-999999', category: 'Health', icon: './assets/ambulance.png' },
+
+        { title: 'Women & Child Helpline', subtitle: 'Women & Child Helpline', number: '109', category: 'Help', icon: './assets/emergency.png' },
+
+        { title: 'Anti-Corruption Helpline', subtitle: 'Anti-Corruption', number: '106', category: 'Govt.', icon: './assets/emergency.png' },
+
+        { title: 'Electricity Helpline', subtitle: 'Electricity Outage', number: '16216', category: 'Electricity', icon: './assets/emergency.png' },
+
+        { title: 'Brac Helpline', subtitle: 'Brac', number: '16445', category: 'NGO', icon: './assets/brac.png' },
+
+        { title: 'Bangladesh Railway Helpline', subtitle: 'Bangladesh Railway', number: '163', category: 'Travel', icon: './assets/Bangladesh-Railway.png' },
+      ];
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+})();
+</script>
+</body>
+</html>
+
+
