@@ -20,3 +20,30 @@
     .glass { backdrop-filter: blur(6px); }
   </style>
 </head>
+<!-- ✅ NAVBAR -->
+<nav class="navbar bg-white bg-opacity-70 shadow sticky top-0 z-50">
+  <div class="container mx-auto px-4 flex flex-col sm:flex-row items-center justify-between py-2 gap-3 sm:gap-0">
+    <div class="flex items-center gap-3">
+      <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full ring ring-white ring-offset-2 ring-offset-emerald-400 p-1">
+        <img src="./assets/logo-dark.png" alt="Logo" class="w-full h-full object-contain rounded-full" />
+      </div>
+      <span class="text-xl sm:text-2xl font-bold leading-tight text-green-800">
+        Emergency <br class="hidden sm:block" /> Service
+      </span>
+    </div>
+
+    <div class="flex items-center gap-2 sm:gap-3">
+      <div class="flex items-center bg-green-50 rounded-full px-3 py-1 gap-1">
+        <span class="text-sm font-semibold text-black" id="heartCount">0</span>
+        <img src="./assets/heart.png" alt="Heart" class="w-4 h-4" />
+      </div>
+      <div class="flex items-center bg-green-50 rounded-full px-3 py-1 gap-1">
+        <span class="text-sm font-semibold text-black" id="coinCount">100</span>
+        <img src="./assets/coin.png" alt="Coin" class="w-4 h-4" />
+      </div>
+      <button id="copyPill" class="btn btn-success btn-sm rounded-full text-white normal-case px-4">
+        <span id="copyCount">0</span> Copy
+      </button>
+    </div>
+  </div>
+</nav>
